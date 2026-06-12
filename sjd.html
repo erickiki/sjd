@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Verificador de Personal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 500px;
+            width: 100%;
+            background: white;
+            border-radius: 32px;
+            padding: 32px 24px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+
+        .logo {
+            width: 80px;
+            height: 80px;
+            background: #667eea;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 40px;
+        }
+
+        h1 {
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 32px;
+        }
+
+        /* Estado Cargando */
+        .loading {
+            padding: 40px;
+            background: #f5f5f5;
+            border-radius: 20px;
+            margin: 20px 0;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #e0e0e0;
+            border-top-color: #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Estado Activo */
+        .activo {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            padding: 40px;
+            border-radius: 20px;
+            margin: 20px 0;
+            color: white;
+        }
+
+        .activo .icono {
+            font-size: 64px;
+            margin-bottom: 16px;
+        }
+
+        .activo .estatus {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .activo .nombre {
+            font-size: 20px;
+            opacity: 0.95;
+        }
+
+        /* Estado Inactivo */
+        .inactivo {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            padding: 40px;
+            border-radius: 20px;
+            margin: 20px 0;
+            color: white;
+        }
+
+        .inactivo .icono {
+            font-size: 64px;
+            margin-bottom: 16px;
+        }
+
+        .inactivo .estatus {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .inactivo .nombre {
+            font-size: 20px;
+            opacity: 0.95;
+        }
+
+        /* Error */
+        .error {
+            background: #fef2f2;
+            border: 2px solid #fecaca;
+            padding: 40px;
+            border-radius: 20px;
+            margin: 20px 0;
+            color: #991b1b;
+        }
+
+        .footer {
+            margin-top: 24px;
+            color: #999;
+            font-size: 12px;
+        }
+
+        .empleado-id {
+            margin-top: 16px;
+            font-size: 12px;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+            👔
+        </div>
+        <h1>Verificador de Personal</h1>
+        <div class="subtitle">Validación de estatus laboral</div>
+
+        <div id="resultado">
+            <div class="loading">
+                <div class="spinner"></div>
+                <p>Verificando estatus...</p>
+            </div>
+        </div>
+
+        <div class="footer">
+            Sistema de verificación de personal
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // CONFIGURACIÓN DE SUPBASE
+        // ============================================
+        const SUPABASE_URL = 'https://TU_PROYECTO.supabase.co';  // 👈 REEMPLAZA
+        const SUPABASE_ANON_KEY = 'TU_CLAVE_ANON';               // 👈 REEMPLAZA
+
+        // ============================================
+        // FUNCIÓN PARA OBTENER EL ID DE LA URL
+        // ============================================
+        function obtenerIdDesdeURL() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('id');
+        }
+
+        // ============================================
+        // FUNCIÓN PARA CONSULTAR SUPABASE
+        // ============================================
+        async function consultarEmpleado(id) {
+            try {
+                const response = await fetch(
+                    `${SUPABASE_URL}/rest/v1/empleados?id=eq.${id}&select=nombre,estado`,
+                    {
+                        headers: {
+                            'apikey': SUPABASE_ANON_KEY,
+                            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+                        }
+                    }
+                );
+
+                if (!response.ok) {
+                    throw new Error('Error en la conexión');
+                }
+
+                const data = await response.json();
+                
+                if (data && data.length > 0) {
+                    return data[0];
+                } else {
+                    return null;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                throw error;
+            }
+        }
+
+        // ============================================
+        // FUNCIÓN PARA MOSTRAR EL RESULTADO
+        // ============================================
+        function mostrarResultado(empleado, error = null) {
+            const resultadoDiv = document.getElementById('resultado');
+            
+            if (error) {
+                resultadoDiv.innerHTML = `
+                    <div class="error">
+                        <div class="icono">⚠️</div>
+                        <div class="estatus">Error</div>
+                        <p>${error}</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            if (!empleado) {
+                resultadoDiv.innerHTML = `
+                    <div class="error">
+                        <div class="icono">🔍</div>
+                        <div class="estatus">No encontrado</div>
+                        <p>El código escaneado no corresponde a ningún empleado registrado.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const esActivo = empleado.estado === 'activo';
+            const estadoClass = esActivo ? 'activo' : 'inactivo';
+            const icono = esActivo ? '✅' : '❌';
+            const estatusTexto = esActivo ? 'ACTIVO' : 'INACTIVO';
+            
+            resultadoDiv.innerHTML = `
+                <div class="${estadoClass}">
+                    <div class="icono">${icono}</div>
+                    <div class="estatus">${estatusTexto}</div>
+                    <div class="nombre">${empleado.nombre}</div>
+                    <div class="empleado-id">ID: ${obtenerIdDesdeURL()}</div>
+                </div>
+            `;
+        }
+
+        // ============================================
+        // FUNCIÓN PRINCIPAL
+        // ============================================
+        async function main() {
+            const id = obtenerIdDesdeURL();
+            
+            if (!id) {
+                mostrarResultado(null, 'No se encontró un código válido. Por favor, escanea un QR válido.');
+                return;
+            }
+            
+            try {
+                const empleado = await consultarEmpleado(id);
+                mostrarResultado(empleado);
+            } catch (error) {
+                mostrarResultado(null, 'Error al conectar con el servidor. Por favor, intenta más tarde.');
+            }
+        }
+        
+        // Ejecutar la aplicación
+        main();
+    </script>
+</body>
+</html>
