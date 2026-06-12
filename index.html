@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Verificador de Personal</title>
+    <title>San Juan de Dios La Paz Bolivia</title>
     <style>
         * {
             margin: 0;
@@ -13,7 +13,7 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #3098ee 0%, #2574b4 100%);
             min-height: 100vh;
             display: flex;
             justify-content: center;
@@ -34,7 +34,7 @@
         .logo {
             width: 80px;
             height: 80px;
-            background: #667eea;
+            background: #6fbeff;
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -67,7 +67,7 @@
             width: 50px;
             height: 50px;
             border: 4px solid #e0e0e0;
-            border-top-color: #667eea;
+            border-top-color: #3098ee;
             border-radius: 50%;
             animation: spin 1s linear infinite;
             margin: 0 auto 16px;
@@ -155,7 +155,7 @@
         <div class="logo">
             🏥
         </div>
-        <h1>Verificador de Personal</h1>
+        <h1>San Juan de Dios La Paz Bolivia</h1>
         <div class="subtitle">Validación de estatus laboral</div>
 
         <div id="resultado">
@@ -166,8 +166,7 @@
         </div>
 
         <div class="footer">
-            Sistema de verificación de personal
-        </div>
+            Sistema de verificación de personal <br> "CRSM SAN JUAN DE DIOS"        </div>
     </div>
 
     <script>
@@ -191,7 +190,7 @@
         async function consultarEmpleado(id) {
             try {
                 const response = await fetch(
-                    `${SUPABASE_URL}/rest/v1/empleados?id=eq.${id}&select=nombre,estado`,
+                    `${SUPABASE_URL}/rest/v1/empleados?id=eq.${id}&select=nombre,estado,cargo`,
                     {
                         headers: {
                             'apikey': SUPABASE_ANON_KEY,
@@ -255,6 +254,7 @@
                     <div class="icono">${icono}</div>
                     <div class="estatus">${estatusTexto}</div>
                     <div class="nombre">${empleado.nombre}</div>
+                    <div class="cargo">${empleado.cargo}</div>
                     <div class="empleado-id">ID: ${obtenerIdDesdeURL()}</div>
                 </div>
             `;
