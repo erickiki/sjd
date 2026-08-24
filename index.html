@@ -13,7 +13,11 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
-            background: linear-gradient(135deg, #3098ee 0%, #2574b4 100%);
+            background-image: url('assets/images/fondo.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
             min-height: 100vh;
             display: flex;
             justify-content: center;
@@ -32,15 +36,19 @@
         }
 
         .logo {
-            width: 80px;
-            height: 80px;
-            background: #6fbeff;
-            border-radius: 50%;
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 20px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 20px;
-            font-size: 40px;
+        }
+
+        .logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 50%;
         }
 
         h1 {
@@ -153,7 +161,7 @@
 <body>
     <div class="container">
         <div class="logo">
-            🏥
+            <img src="assets/images/logo.png" alt="Logo San Juan de Dios">
         </div>
         <h1>San Juan de Dios <br>La Paz Bolivia</h1>
         <div class="subtitle">Validación de estatus laboral</div>
@@ -170,23 +178,15 @@
     </div>
 
     <script>
-        // ============================================
-        // CONFIGURACIÓN DE SUPBASE
-        // ============================================
-        const SUPABASE_URL = 'https://mustapffaqcjcyjgmbds.supabase.co';  // 👈 REEMPLAZA
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im11c3RhcGZmYXFjamN5amdtYmRzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDA1MjM1NTgsImV4cCI6MjA1NjA5OTU1OH0.GtDYkQgp8KYInoDTaO3o8cncoOM2RodKu_HFRGE3Irk';               // 👈 REEMPLAZA
-
-        // ============================================
-        // FUNCIÓN PARA OBTENER EL ID DE LA URL
-        // ============================================
+        const SUPABASE_URL = 'https://mustapffaqcjcyjgmbds.supabase.co';  
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im11c3RhcGZmYXFjamN5amdtYmRzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDA1MjM1NTgsImV4cCI6MjA1NjA5OTU1OH0.GtDYkQgp8KYInoDTaO3o8cncoOM2RodKu_HFRGE3Irk';             
+        
         function obtenerIdDesdeURL() {
             const urlParams = new URLSearchParams(window.location.search);
             return urlParams.get('id');
         }
 
-        // ============================================
-        // FUNCIÓN PARA CONSULTAR SUPABASE
-        // ============================================
+        
         async function consultarEmpleado(id) {
             try {
                 const response = await fetch(
